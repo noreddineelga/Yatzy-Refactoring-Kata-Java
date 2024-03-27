@@ -1,127 +1,104 @@
-import org.junit.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 public class YatzyTest {
 
-    @Test
-    public void chance_scores_sum_of_all_dice() {
-        Yatzy yatzy1 = new Yatzy(2,3,4,5,1);
-        Yatzy yatzy2 = new Yatzy(3,3,4,5,1);
-        int expected = 15;
-        int actual = yatzy1.chance();
-        assertEquals(expected, actual);
-        assertEquals(16, yatzy2.chance());
+    @ParameterizedTest
+    @CsvSource(value = {"2,3,4,5,1:15", "3,3,4,5,1:16"}, delimiter = ':')
+    public void chance_scores_sum_of_all_dice(String dices, int expected) {
+        assertEquals(expected, yatzyFromString(dices).chance());
     }
 
-    @Test public void yatzy_scores_50() {
-        int expected = 50;
-        Yatzy yatzy1 = new Yatzy(4,4,4,4,4);
-        Yatzy yatzy2 = new Yatzy(6,6,6,6,6);
-        Yatzy yatzy3 = new Yatzy(6,6,6,6,3);
-        assertEquals(expected, yatzy1.yatzy());
-        assertEquals(expected, yatzy2.yatzy());
-        assertEquals(0, yatzy3.yatzy());
+    @ParameterizedTest
+    @CsvSource(value = {"4,4,4,4,4:50", "6,6,6,6,6:50", "6,6,6,6,3:0"}, delimiter = ':')
+    public void yatzy_scores_50(String dices, int expected) {
+        assertEquals(expected, yatzyFromString(dices).yatzy());
     }
 
-    @Test public void test_1s() {
-        Yatzy yatzy1 = new Yatzy(1,2,3,4,5);
-        Yatzy yatzy2 = new Yatzy(1,2,1,4,5);
-        Yatzy yatzy3 = new Yatzy(6,2,2,4,5);
-        Yatzy yatzy4 = new Yatzy(1,2,1,1,1);
-        assertEquals(1, yatzy1.valCount(1));
-        assertEquals(2, yatzy2.valCount(1));
-        assertEquals(0, yatzy3.valCount(1));
-        assertEquals(4, yatzy4.valCount(1));
+    @ParameterizedTest
+    @CsvSource(value = {"1,2,3,4,5:1", "1,2,1,4,5:2", "6,2,2,4,5:0", "1,2,1,1,1:4"}, delimiter = ':')
+    public void test_1s(String dices, int expected) {
+        assertEquals(expected, yatzyFromString(dices).valCount(1));
     }
 
-    @Test
-    public void test_2s() {
-        Yatzy yatzy1 = new Yatzy(1,2,3,2,6);
-        Yatzy yatzy2 = new Yatzy(2,2,2,2,2);
-        assertEquals(4, yatzy1.valCount(2));
-        assertEquals(10, yatzy2.valCount(2));
+    @ParameterizedTest
+    @CsvSource(value = {"1,2,3,2,6:4", "2,2,2,2,2:10"}, delimiter = ':')
+    public void test_2s(String dices, int expected) {
+        assertEquals(expected, yatzyFromString(dices).valCount(2));
     }
 
-    @Test
-    public void test_threes() {
-        Yatzy yatzy1 = new Yatzy(1,2,3,2,3);
-        Yatzy yatzy2 = new Yatzy(2,3,3,3,3);
-        assertEquals(6, yatzy1.valCount(3));
-        assertEquals(12, yatzy2.valCount(3));
+    @ParameterizedTest
+    @CsvSource(value = {"1,2,3,2,3:6", "2,3,3,3,3:12"}, delimiter = ':')
+    public void test_threes(String dices, int expected) {
+        assertEquals(expected, yatzyFromString(dices).valCount(3));
     }
 
-    @Test
-    public void fours_test() 
+    @ParameterizedTest
+    @CsvSource(value = {"4,4,4,5,5:12", "4,4,5,5,5:8", "4,5,5,5,5:4"}, delimiter = ':')
+    public void fours_test(String dices, int expected)
     {
-        Yatzy yatzy1 = new Yatzy(4,4,4,5,5);
-        Yatzy yatzy2 = new Yatzy(4,4,5,5,5);
-        Yatzy yatzy3 = new Yatzy(4,5,5,5,5);
-        assertEquals(12, yatzy1.valCount(4));
-        assertEquals(8, yatzy2.valCount(4));
-        assertEquals(4, yatzy3.valCount(4));
+        assertEquals(expected, yatzyFromString(dices).valCount(4));
     }
 
-    @Test
-    public void fives() {
-        assertEquals(10, new Yatzy(4,4,4,5,5).valCount(5));
-        assertEquals(15, new Yatzy(4,4,5,5,5).valCount(5));
-        assertEquals(20, new Yatzy(4,5,5,5,5).valCount(5));
+    @ParameterizedTest
+    @CsvSource(value = {"4,4,4,5,5:10", "4,4,5,5,5:15", "4,5,5,5,5:20"}, delimiter = ':')
+    public void fives(String dices, int expected) {
+        assertEquals(expected, yatzyFromString(dices).valCount(5));
     }
 
-    @Test
-    public void sixes_test() {
-        assertEquals(0, new Yatzy(4,4,4,5,5).valCount(6));
-        assertEquals(6, new Yatzy(4,4,6,5,5).valCount(6));
-        assertEquals(18, new Yatzy(6,5,6,6,5).valCount(6));
+    @ParameterizedTest
+    @CsvSource(value = {"4,4,4,5,5:0", "4,4,6,5,5:6", "6,5,6,6,5:18"}, delimiter = ':')
+    public void sixes_test(String dices, int expected) {
+        assertEquals(expected, yatzyFromString(dices).valCount(6));
     }
 
-    @Test
-    public void one_pair() {
-        assertEquals(6, new Yatzy(3,4,3,5,6).score_pairs(true));
-        assertEquals(10, new Yatzy(5,3,3,3,5).score_pairs(true));
-        assertEquals(12, new Yatzy(5,3,6,6,5).score_pairs(true));
+    @ParameterizedTest
+    @CsvSource(value = {"3,4,3,5,6:6", "5,3,3,3,5:10", "5,3,6,6,5:12"}, delimiter = ':')
+    public void one_pair(String dices, int expected) {
+        assertEquals(expected, yatzyFromString(dices).score_pairs(true));
     }
 
-    @Test
-    public void two_Pair() {
-        assertEquals(16, new Yatzy(3,3,5,4,5).score_pairs(false));
-        assertEquals(16, new Yatzy(3,3,5,5,5).score_pairs(false));
+    @ParameterizedTest
+    @CsvSource(value = {"3,3,5,4,5:16", "3,3,5,5,5:16"}, delimiter = ':')
+    public void two_Pair(String dices, int expected) {
+        assertEquals(expected, yatzyFromString(dices).score_pairs(false));
     }
 
-    @Test
-    public void three_of_a_kind() 
+    @ParameterizedTest
+    @CsvSource(value = {"3,3,3,4,5:9", "5,3,5,4,5:15", "3,3,3,3,5:9"}, delimiter = ':')
+    public void three_of_a_kind(String dices, int expected)
     {
-        assertEquals(9, new Yatzy(3,3,3,4,5).number_of_a_kind(3));
-        assertEquals(15, new Yatzy(5,3,5,4,5).number_of_a_kind(3));
-        assertEquals(9, new Yatzy(3,3,3,3,5).number_of_a_kind(3));
+        assertEquals(expected, yatzyFromString(dices).number_of_a_kind(3));
     }
 
-    @Test
-    public void four_of_a_knd() {
-        assertEquals(12, new Yatzy(3,3,3,3,5).number_of_a_kind(4));
-        assertEquals(20, new Yatzy(5,5,5,4,5).number_of_a_kind(4));
-        assertEquals(12, new Yatzy(3,3,3,3,3).number_of_a_kind(4));
+    @ParameterizedTest
+    @CsvSource(value = {"3,3,3,3,5:12", "5,5,5,4,5:20", "3,3,3,3,3:12"}, delimiter = ':')
+    public void four_of_a_knd(String dices, int expected) {
+        assertEquals(expected, yatzyFromString(dices).number_of_a_kind(4));
     }
 
-    @Test
-    public void smallStraight() {
-        assertEquals(15, new Yatzy(1,2,3,4,5).straight(true));
-        assertEquals(15, new Yatzy(2,3,4,5,1).straight(true));
-        assertEquals(0, new Yatzy(1,2,2,4,5).straight(true));
+    @ParameterizedTest
+    @CsvSource(value = {"1,2,3,4,5:15", "2,3,4,5,1:15", "1,2,2,4,5:0"}, delimiter = ':')
+    public void smallStraight(String dices, int expected) {
+        assertEquals(expected, yatzyFromString(dices).straight(true));
     }
 
-    @Test
-    public void largeStraight() {
-        assertEquals(20, new Yatzy(6,2,3,4,5).straight(false));
-        assertEquals(20, new Yatzy(2,3,4,5,6).straight(false));
-        assertEquals(0, new Yatzy(1,2,3,4,5).straight(false));
+    @ParameterizedTest
+    @CsvSource(value = {"6,2,3,4,5:20", "2,3,4,5,6:20", "1,2,3,4,5:0"}, delimiter = ':')
+    public void largeStraight(String dices, int expected) {
+        assertEquals(expected, yatzyFromString(dices).straight(false));
     }
 
-    @Test
-    public void fullHouse() {
-        assertEquals(25, new Yatzy(6,3,3,3,6).fullHouse());
-        assertEquals(25, new Yatzy(1,1,1,3,3).fullHouse());
-        assertEquals(0, new Yatzy(2,2,5,5,6).fullHouse());
-        assertEquals(0, new Yatzy(2,3,4,5,6).fullHouse());
+    @ParameterizedTest
+    @CsvSource(value = {"6,3,3,3,6:25", "1,1,1,3,3:25", "2,2,5,5,6:0", "2,3,4,5,6:0"}, delimiter = ':')
+    public void fullHouse(String dices, int expected) {
+        assertEquals(expected, yatzyFromString(dices).fullHouse());
+    }
+
+    private Yatzy yatzyFromString(String dices){
+        String[] arr = dices.split(",");
+        return new Yatzy(Integer.valueOf(arr[0]), Integer.valueOf(arr[1]), Integer.valueOf(arr[2]), Integer.valueOf(arr[3]),
+            Integer.valueOf(arr[4]));
     }
 }
